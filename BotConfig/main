@@ -1,0 +1,33 @@
+from aiogram import Bot, Dispatcher, executor
+from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, InlineKeyboardButton,InlineKeyboardMarkup,Message
+import sqlite3
+BOT_TOKEN = "5240173574:AAEEDJ95oIbbf6eLr4JlBKb_Uy95TSW6Or8"
+botObject = Bot(token=BOT_TOKEN)
+dp = Dispatcher(botObject)
+
+@dp.message_handler(commands='start')
+async def send_welcome(message: Message):
+    await message.reply("Привет, рады тебя видеть",reply_markup=Menu.startKeyboardMarkup)
+@dp.message_handler(lambda message: message.text == "Баланс")
+async def send_welcome(message: Message):
+    await message.reply("Привет, рады тебя видеть",reply_markup=Menu.balanceKeyboardMarkup)
+class Menu():
+    startKeyboardButtons = [KeyboardButton("Асортимент"), KeyboardButton("Баланс"), KeyboardButton("Выбрать категорию")]  
+    startKeyboardMarkup = ReplyKeyboardMarkup(keyboard = [startKeyboardButtons],resize_keyboard=True)
+    
+    balanceKeyboardButtons = [KeyboardButton("Пополнить баланс"), KeyboardButton("Проверить баланс")]
+    balanceKeyboardMarkup = ReplyKeyboardMarkup(keyboard = [balanceKeyboardButtons],resize_keyboard=True).insert(KeyboardButton("назад"))
+#подрубить бд
+class DataBase():
+    connect = sqlite3.connect('sale.db')
+    cur = connect.cursor()
+    cur.execute('''CREATE TABLE product IF NOT EXIST
+               (category,name,price,quantiry,info,)''')
+    cur.execute('''CREATE TABLE user IF NOT EXIST
+               (userId,name,history)''')
+    connect.commit()
+    
+
+
+if __name__ == '__main__':
+    executor.start_polling(dp, skip_updates=True)
